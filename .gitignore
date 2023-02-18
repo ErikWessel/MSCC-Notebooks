@@ -1,5 +1,8 @@
 # Custom exclusions
 results/
+data/
+out/
+login.yml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
