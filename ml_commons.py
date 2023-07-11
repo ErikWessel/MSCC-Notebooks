@@ -15,7 +15,7 @@ from sklearn.metrics import (ConfusionMatrixDisplay, confusion_matrix,
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from torchvision.models import EfficientNet, SwinTransformer
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 class_names =   ['CLR', 'FEW', 'SCT', 'BKN', 'OVC']
 classes = list(range(len(class_names)))
@@ -71,7 +71,7 @@ class AimlsseImageDataset(Dataset):
     def get_image(self, index) -> np.ndarray:
         path = self.get_image_path(index)
         image = rasterio.open(path)
-        image_tensor = torch.from_numpy(image.read())
+        image_tensor = torch.from_numpy(image.read()).clamp(0.001, 1)
         image.close()
         # Select label and perform transformations
         if self.transform:
@@ -187,6 +187,7 @@ def display_confusion_matrix(model:nn.Module, device, dataloader:DataLoader, out
     predicted_labels: List = []
     all_indices: List = []
 
+    time_start = time.perf_counter()
     # get predictions for N images from the dataloader
     with torch.no_grad():
         inputs: torch.Tensor
@@ -200,6 +201,8 @@ def display_confusion_matrix(model:nn.Module, device, dataloader:DataLoader, out
             true_labels += labels.cpu().numpy().tolist()
             predicted_labels += predicted.cpu().numpy().tolist()
             all_indices += indices.tolist()
+    time_end = time.perf_counter()
+    print(f'{len(predicted_labels)} predictions in {time_end - time_start:.2f} seconds')
 
     # compute the confusion matrix
     cm = confusion_matrix(true_labels, predicted_labels, labels=range(len(classes)), normalize=normalization_mode)
@@ -207,11 +210,14 @@ def display_confusion_matrix(model:nn.Module, device, dataloader:DataLoader, out
     # display the confusion matrix
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
     disp.plot(include_values=True, cmap='viridis', ax=None, xticks_rotation='horizontal')
+    if normalization is not None:
+        disp.ax_.get_images()[0].set_clim(0, 1)
     plt.grid(False)
     plt.title(title)
     plt.show()
 
     data_out = pd.DataFrame({'true label': true_labels, 'predicted label': predicted_labels, 'index': all_indices})
+    print(data_out)
     data_out['true label'] = data_out['true label'].apply(lambda x: class_names[x])
     data_out['predicted label'] = data_out['predicted label'].apply(lambda x: class_names[x])
     return data_out

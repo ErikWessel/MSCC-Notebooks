@@ -1,19 +1,22 @@
 paths:
   prefix_dir: 'data'
-  dataset_dir: 'dataset_manual_labels'
+  dataset_dir: 'dataset_16km_300_ndsi'
   machine_learning_dir: 'ML'
 model:
   name: 'EfficientNet'
   freeze_parameters: False
+  use_transfer_learning: False
 processing:
   batch_size: 16
   batch_normalization: False
-  batch_accumulation: 3
+  batch_accumulation: 'all'
   num_epochs: 32
   use_ordinal_regression: True
+  use_one_neuron_regression: False
+  ordinal_regression_loss: 'MSE'
   activation_function: 'Sigmoid'
-  use_weighted_loss_function: True
-  use_weighted_sampler: False
+  use_weighted_loss_function: False
+  use_weighted_sampler: True
   use_manual_labels: False
   optimizer: 'Adam'
   learning_rate_exp: 3
@@ -23,6 +26,6 @@ processing:
   use_weight_decay: False
   weight_decay_exp: 4
 output:
-  output_name: 'local_dummy.pt'
+  output_name: 'efficientnet_v2_s_preset_3_16km_300_weighted_sampler_ord_regr_batchacc_all.pt'
   show_samples: False
   show_summary: False
