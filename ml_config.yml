@@ -9,9 +9,9 @@ model:
 processing:
   batch_size: 16
   batch_normalization: False
-  batch_accumulation: 'all'
+  batch_accumulation: 3
   num_epochs: 32
-  use_ordinal_regression: True
+  use_ordinal_regression: False
   use_one_neuron_regression: False
   ordinal_regression_loss: 'MSE'
   activation_function: 'Sigmoid'
@@ -21,11 +21,11 @@ processing:
   optimizer: 'Adam'
   learning_rate_exp: 3
   momentum: 0.9
-  use_dropout: False
-  dropout_p: 0.5
+  use_dropout: True
+  dropout_p: 0.2
   use_weight_decay: False
   weight_decay_exp: 4
 output:
-  output_name: 'efficientnet_v2_s_preset_3_16km_300_weighted_sampler_ord_regr_batchacc_all.pt'
+  output_name: 'efficientnet_v2_s_preset_3_16km_300_weighted_sampler_classification_dropout_20.pt'
   show_samples: False
   show_summary: False
